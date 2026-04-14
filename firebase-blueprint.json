@@ -1,0 +1,228 @@
+{
+  "entities": {
+    "Character": {
+      "title": "Character",
+      "description": "A D&D character document",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "race": { "type": "string" },
+        "charClass": { "type": "string" },
+        "level": { "type": "integer" },
+        "xp": { "type": "integer" },
+        "hp": {
+          "type": "object",
+          "properties": {
+            "current": { "type": "integer" },
+            "max": { "type": "integer" }
+          }
+        },
+        "ac": { "type": "integer" },
+        "attributes": {
+          "type": "object",
+          "properties": {
+            "str": { "type": "integer" },
+            "dex": { "type": "integer" },
+            "con": { "type": "integer" },
+            "int": { "type": "integer" },
+            "wis": { "type": "integer" },
+            "cha": { "type": "integer" }
+          }
+        },
+        "inventory": { "type": "array", "items": { "type": "object" } },
+        "gold": { "type": "integer" },
+        "spells": { "type": "array", "items": { "type": "string" } },
+        "spellcasting": {
+          "type": "object",
+          "properties": {
+            "ability": { "type": "string" },
+            "saveDC": { "type": "integer" },
+            "attackBonus": { "type": "integer" },
+            "slots": { "type": "object" },
+            "prepared": { "type": "array", "items": { "type": "string" } },
+            "spells": { "type": "array", "items": { "type": "object" } },
+            "type": { "type": "string", "enum": ["Prepared", "Known", "Spellbook"] }
+          }
+        },
+        "background": { "type": "string" },
+        "alignment": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "race", "charClass"]
+    },
+    "Campaign": {
+      "title": "Campaign",
+      "description": "A D&D campaign document",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "dmId": { "type": "string" },
+        "inviteCode": { "type": "string" },
+        "players": { "type": "array", "items": { "type": "string" } },
+        "characterRefs": { "type": "array", "items": { "type": "object" } },
+        "formation": { "type": "object" },
+        "settings": { "type": "object" },
+        "bestiary": { "type": "object" },
+        "activeVoting": { "type": "object" },
+        "notifications": { "type": "array", "items": { "type": "object" } },
+        "combat": { "type": "object" },
+        "quests": { "type": "array", "items": { "type": "object" } },
+        "achievements": { "type": "array", "items": { "type": "object" } },
+        "merchantEvent": { "type": "object" },
+        "deleted": { "type": "boolean" }
+      },
+      "required": ["name", "dmId", "inviteCode"]
+    },
+    "NPC": {
+      "title": "NPC",
+      "description": "An NPC within a campaign",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "race": { "type": "string" },
+        "charClass": { "type": "string" },
+        "role": { "type": "string" },
+        "description": { "type": "string" },
+        "appearance": { "type": "string" },
+        "campaignId": { "type": "string" },
+        "deleted": { "type": "boolean" }
+      },
+      "required": ["name", "campaignId"]
+    },
+    "Scroll": {
+      "title": "Scroll",
+      "description": "A shared document in a campaign",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "content": { "type": "string" },
+        "campaignId": { "type": "string" },
+        "authorIds": { "type": "array", "items": { "type": "string" } },
+        "lastEditedBy": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "links": { "type": "array", "items": { "type": "string" } },
+        "deleted": { "type": "boolean" },
+        "style": { "type": "object" }
+      },
+      "required": ["name", "campaignId"]
+    },
+    "MonsterNote": {
+      "title": "MonsterNote",
+      "description": "A note about a monster in a campaign",
+      "type": "object",
+      "properties": {
+        "monsterId": { "type": "string" },
+        "campaignId": { "type": "string" },
+        "authorId": { "type": "string" },
+        "content": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["monsterId", "campaignId", "authorId", "content"]
+    },
+    "Friendship": {
+      "title": "Friendship",
+      "description": "A friendship between characters",
+      "type": "object",
+      "properties": {
+        "charIds": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["pending", "accepted"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["charIds", "status"]
+    },
+    "Guild": {
+      "title": "Guild",
+      "description": "A collective character entity representing a guild",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "leaderId": { "type": "string" },
+        "memberRefs": { 
+          "type": "array", 
+          "items": { 
+            "type": "object",
+            "properties": {
+              "userId": { "type": "string" },
+              "charId": { "type": "string" },
+              "rank": { "type": "string", "enum": ["Recruta", "Membro", "Veterano", "Oficial", "Líder"] }
+            }
+          } 
+        },
+        "level": { "type": "integer", "minimum": 1, "maximum": 10 },
+        "reputation": { "type": "integer" },
+        "specialization": { "type": "string" },
+        "resources": {
+          "type": "object",
+          "properties": {
+            "gold": { "type": "integer" },
+            "items": { "type": "array", "items": { "type": "object" } },
+            "base": { "type": "string" }
+          }
+        },
+        "economy": {
+          "type": "object",
+          "properties": {
+            "vault": { "type": "integer" },
+            "taxRate": { "type": "number" },
+            "investments": { "type": "array", "items": { "type": "object" } }
+          }
+        },
+        "dailyQuests": { "type": "array", "items": { "type": "object" } },
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "leaderId", "level", "reputation"]
+    },
+    "ActiveRoll": {
+      "title": "ActiveRoll",
+      "description": "A die roll in the campaign dice tray",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "characterName": { "type": "string" },
+        "characterAvatar": { "type": "string" },
+        "dieType": { "type": "string" },
+        "result": { "type": "integer" },
+        "status": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": "integer" }
+      },
+      "required": ["userId", "characterName", "dieType", "result", "status", "timestamp", "expiresAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/characters/{charId}": {
+      "schema": "Character",
+      "description": "User characters"
+    },
+    "/campaigns/{campaignId}": {
+      "schema": "Campaign",
+      "description": "Campaign documents"
+    },
+    "/campaigns/{campaignId}/npcs/{npcId}": {
+      "schema": "NPC",
+      "description": "Campaign NPCs"
+    },
+    "/campaigns/{campaignId}/monsterNotes/{noteId}": {
+      "schema": "MonsterNote",
+      "description": "Campaign monster notes"
+    },
+    "/campaigns/{campaignId}/scrolls/{scrollId}": {
+      "schema": "Scroll",
+      "description": "Campaign scrolls"
+    },
+    "/campaigns/{campaignId}/activeRolls/{rollId}": {
+      "schema": "ActiveRoll",
+      "description": "Campaign active dice rolls"
+    },
+    "/friendships/{friendshipId}": {
+      "schema": "Friendship",
+      "description": "Character friendships"
+    },
+    "/guilds/{guildId}": {
+      "schema": "Guild",
+      "description": "Character guilds"
+    }
+  }
+}

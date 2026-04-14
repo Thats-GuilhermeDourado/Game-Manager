@@ -1,0 +1,60 @@
+src/pages/Social.tsx:    guilds, 
+src/pages/Social.tsx:    createGuild,
+src/pages/Social.tsx:  const [activeTab, setActiveTab] = useState<'friends' | 'guilds'>('friends');
+src/pages/Social.tsx:  const [isGuildModalOpen, setIsGuildModalOpen] = useState(false);
+src/pages/Social.tsx:  const [newGuildName, setNewGuildName] = useState('');
+src/pages/Social.tsx:            <Users size={14} className="text-gold" /> Alianças & Guildas
+src/pages/Social.tsx:            onClick={() => setActiveTab('guilds')}
+src/pages/Social.tsx:              activeTab === 'guilds' 
+src/pages/Social.tsx:            Guildas
+src/pages/Social.tsx:          /* Guilds Tab */
+src/pages/Social.tsx:                <Shield className="text-gold" size={32} strokeWidth={2.5} /> Guildas Ativas
+src/pages/Social.tsx:                onClick={() => setIsGuildModalOpen(true)}
+src/pages/Social.tsx:                <Shield size={18} strokeWidth={3} /> Formar Guilda
+src/pages/Social.tsx:              {guilds.map(guild => (
+src/pages/Social.tsx:                  key={guild.id}
+src/pages/Social.tsx:                      <div className="text-[10px] text-gold font-black uppercase tracking-[0.3em] drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">Nível da Guilda 1</div>
+src/pages/Social.tsx:                      <div className="text-[10px] text-parchment/20 uppercase font-black tracking-widest">{guild.memberRefs.length} Membros</div>
+src/pages/Social.tsx:                    <h3 className="text-4xl font-display font-black text-parchment uppercase tracking-tighter leading-none group-hover:text-gold transition-colors">{guild.name}</h3>
+src/pages/Social.tsx:                    {guild.memberRefs.map((ref, i) => (
+src/pages/Social.tsx:                      {guild.notes?.length > 0 ? guild.notes.map((note, idx) => (
+src/pages/Social.tsx:              {guilds.length === 0 && (
+src/pages/Social.tsx:                  <h3 className="text-3xl font-display font-black text-parchment uppercase tracking-widest">Nenhuma Guilda Encontrada</h3>
+src/pages/Social.tsx:                  <p className="text-[10px] font-black uppercase tracking-[0.3em] max-w-md mx-auto mt-4">Guildas requerem pelo menos 3 membros para estarem totalmente ativas. Forme uma hoje!</p>
+src/pages/Social.tsx:      {/* Guild Creation Modal */}
+src/pages/Social.tsx:        {isGuildModalOpen && (
+src/pages/Social.tsx:              onClick={() => setIsGuildModalOpen(false)}
+src/pages/Social.tsx:              <h2 className="text-3xl font-display font-black text-gold uppercase tracking-tighter mb-6 text-center">Form Your Guild</h2>
+src/pages/Social.tsx:                  <label className="block text-[10px] uppercase font-bold text-gold/60 tracking-widest mb-2">Guild Name</label>
+src/pages/Social.tsx:                    value={newGuildName}
+src/pages/Social.tsx:                    onChange={(e) => setNewGuildName(e.target.value)}
+src/pages/Social.tsx:                    "A guild is more than a group; it is a legacy. As leader, you will manage the hall, formations, and the shared knowledge base."
+src/pages/Social.tsx:                    createGuild(newGuildName);
+src/pages/Social.tsx:                    setIsGuildModalOpen(false);
+src/pages/Social.tsx:                    setNewGuildName('');
+src/pages/Social.tsx:                  disabled={!newGuildName}
+src/pages/CharacterSheet.tsx:    guilds,
+src/pages/CharacterSheet.tsx:                      {/* Guild & Achievements */}
+src/pages/CharacterSheet.tsx:                        {currentCharacter.profile?.showGuild && currentCharacter.guildId && (
+src/pages/CharacterSheet.tsx:                              Guilda & Afiliações
+src/pages/CharacterSheet.tsx:                                  {guilds.find(g => g.id === currentCharacter.guildId)?.name || "Guilda Desconhecida"}
+src/pages/CharacterSheet.tsx:                            onClick={() => setEditedChar(prev => prev ? { ...prev, profile: { ...prev.profile, showGuild: !prev.profile?.showGuild } } : null)}
+src/pages/CharacterSheet.tsx:                              editedChar?.profile?.showGuild ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-white/5 border-white/10 text-parchment/40"
+src/pages/CharacterSheet.tsx:                            <span className="text-[9px] font-black uppercase tracking-widest">Mostrar Guilda</span>
+src/pages/CharacterSheet.tsx:                            <div className={cn("w-4 h-4 rounded-full border-2 transition-all", editedChar?.profile?.showGuild ? "bg-emerald-400 border-emerald-400" : "border-white/20")} />
+src/pages/Auth.tsx:            {loading ? 'Processing...' : (isLogin ? 'Enter the Realm' : 'Join the Guild')}
+src/contexts/CharacterContext.tsx:export interface Guild {
+src/contexts/CharacterContext.tsx:  guildId?: string;
+src/contexts/CharacterContext.tsx:    showGuild: boolean;
+src/contexts/CharacterContext.tsx:  guilds: Guild[];
+src/contexts/CharacterContext.tsx:  createGuild: (name: string) => Promise<void>;
+src/contexts/CharacterContext.tsx:  const [guilds, setGuilds] = useState<Guild[]>([]);
+src/contexts/CharacterContext.tsx:      setGuilds([]);
+src/contexts/CharacterContext.tsx:    const q = query(collection(db, "guilds"));
+src/contexts/CharacterContext.tsx:      setGuilds(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Guild)));
+src/contexts/CharacterContext.tsx:      handleFirestoreError(err, OperationType.LIST, "guilds");
+src/contexts/CharacterContext.tsx:  const createGuild = async (name: string) => {
+src/contexts/CharacterContext.tsx:      await addDoc(collection(db, "guilds"), {
+src/contexts/CharacterContext.tsx:      handleFirestoreError(err, OperationType.CREATE, "guilds");
+src/contexts/CharacterContext.tsx:      guilds,
+src/contexts/CharacterContext.tsx:      createGuild,

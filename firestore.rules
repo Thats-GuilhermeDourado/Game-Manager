@@ -1,0 +1,159 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: /users/{userId}/characters/{charId}
+    // Fields:
+    //   - userId: string (required, immutable)
+    //   - name: string (required, 1-50 chars)
+    //   - race: string (required)
+    //   - charClass: string (required)
+    //   - level: number (required, positive)
+    //   - xp: number (required, positive)
+    //   - hp: map { current: number, max: number }
+    //   - ac: number (positive)
+    //   - attributes: map { str, dex, con, int, wis, cha } (all numbers)
+    //   - inventory: list of maps
+    //   - gold: number (positive)
+    //   - updatedAt: timestamp (required)
+    //
+    // Collection: /campaigns/{campaignId}
+    // Fields:
+    //   - name: string (required, 1-100 chars)
+    //   - dmId: string (required, immutable)
+    //   - inviteCode: string (required, 6 chars)
+    //   - players: list of strings (uids)
+    //   - characterRefs: list of maps { userId, charId }
+    //
+    // Collection: /campaigns/{campaignId}/npcs/{npcId}
+    // Fields:
+    //   - name: string (required, 1-50 chars)
+    //   - campaignId: string (required, immutable)
+    //
+    // Collection: /scrolls/{scrollId}
+    // Fields:
+    //   - name: string (required, 1-100 chars)
+    //   - content: string (max 10000 chars)
+    //   - campaignId: string (required, immutable)
+    //
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "guidouradosilva2004@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    function isCampaignMember(campaignId) {
+      let campaign = get(/databases/$(database)/documents/campaigns/$(campaignId)).data;
+      return isAuthenticated() && (campaign.players.hasAny([request.auth.uid]) || campaign.dmId == request.auth.uid);
+    }
+
+    function isJoiningCampaign(campaignId) {
+      let campaign = get(/databases/$(database)/documents/campaigns/$(campaignId)).data;
+      return isAuthenticated() && 
+             request.resource.data.players.hasAny([request.auth.uid]) && 
+             request.resource.data.inviteCode == campaign.inviteCode;
+    }
+
+    function isCampaignDM(campaignId) {
+      return isAuthenticated() && get(/databases/$(database)/documents/campaigns/$(campaignId)).data.dmId == request.auth.uid;
+    }
+
+    function isValidString(val, min, max) {
+      return val is string && val.size() >= min && val.size() <= max;
+    }
+
+    // Domain Validators
+    function isValidCharacter(data) {
+      return data.keys().hasAll(['userId', 'name', 'race', 'charClass', 'updatedAt']) &&
+             isValidString(data.name, 1, 50) &&
+             data.userId is string &&
+             data.race is string &&
+             data.charClass is string;
+    }
+
+    function isValidCampaign(data) {
+      return data.keys().hasAll(['name', 'dmId', 'inviteCode', 'players']) &&
+             isValidString(data.name, 1, 100) &&
+             data.dmId is string &&
+             data.inviteCode is string &&
+             data.players is list;
+    }
+
+    // Characters
+    match /users/{userId}/characters/{charId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) && isValidCharacter(request.resource.data);
+      allow update: if (isOwner(userId) || isCampaignDM(resource.data.campaignId)) && 
+                    isValidCharacter(request.resource.data) &&
+                    request.resource.data.userId == resource.data.userId;
+      allow delete: if isOwner(userId) || isAdmin();
+    }
+
+    // Campaigns
+    match /campaigns/{campaignId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidCampaign(request.resource.data);
+      allow update: if (isCampaignMember(campaignId) || isAdmin() || isJoiningCampaign(campaignId)) && 
+                    isValidCampaign(request.resource.data) &&
+                    request.resource.data.dmId == resource.data.dmId;
+      allow delete: if isCampaignDM(campaignId) || isAdmin();
+
+      // NPCs
+      match /npcs/{npcId} {
+        allow read: if isCampaignMember(campaignId);
+        allow write: if isCampaignDM(campaignId) || isAdmin();
+      }
+
+      // Scrolls
+      match /scrolls/{scrollId} {
+        allow read: if isCampaignMember(campaignId);
+        allow create: if isCampaignMember(campaignId);
+        allow update: if isCampaignMember(campaignId);
+        allow delete: if isCampaignDM(campaignId) || isAdmin();
+      }
+
+      // Monster Notes
+      match /monsterNotes/{noteId} {
+        allow read: if isCampaignMember(campaignId);
+        allow create: if isCampaignMember(campaignId);
+        allow update: if isCampaignMember(campaignId);
+        allow delete: if isCampaignDM(campaignId) || isAdmin();
+      }
+    }
+
+    // Friendships
+    match /friendships/{friendshipId} {
+      allow read: if isAuthenticated() && resource.data.charIds.hasAny([request.auth.uid]); // Assuming charId matches uid for simplicity or needs better mapping
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && resource.data.charIds.hasAny([request.auth.uid]);
+      allow delete: if isAuthenticated() && resource.data.charIds.hasAny([request.auth.uid]);
+    }
+
+    // Guilds
+    match /guilds/{guildId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (resource.data.leaderId == request.auth.uid || isAdmin());
+      allow delete: if isAuthenticated() && (resource.data.leaderId == request.auth.uid || isAdmin());
+    }
+
+    // Collection Group for Characters
+    match /{path=**}/characters/{charId} {
+      allow read: if isAuthenticated();
+    }
+  }
+}
