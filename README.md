@@ -47,7 +47,7 @@ Built for both Dungeon Masters and players, the system handles everything from c
 
 ## Live Demo
 
-> 🔗 **Deployed at:** `[[seu-link-vercel.netlify.app]](https://ais-dev-h5p4uwfrqeke3ctvv4jhzu-280765735839.europe-west1.run.app/auth)`
+> 🔗 **Deployed at:** https://ais-dev-h5p4uwfrqeke3ctvv4jhzu-280765735839.europe-west1.run.app/auth
 
 **Test Credentials:**
 - Login with any Google account
