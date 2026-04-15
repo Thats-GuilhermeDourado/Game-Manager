@@ -42,17 +42,6 @@ Built for both Dungeon Masters and players, the system handles everything from c
 
 <img width="1916" height="895" alt="image" src="https://github.com/user-attachments/assets/ee692328-2a50-46b5-ae95-9c172c9a348c" />
 
-
----
-
-## Live Demo
-
-> 🔗 **Deployed at:** https://ais-dev-h5p4uwfrqeke3ctvv4jhzu-280765735839.europe-west1.run.app/auth
-
-**Test Credentials:**
-- Login with any Google account
-- Create a character → Join a campaign 
-
 ---
 
 ## Key Features
